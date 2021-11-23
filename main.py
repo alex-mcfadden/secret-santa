@@ -16,10 +16,10 @@ async def on_message(message):
 
     if message.content.startswith('$add'):
         names[message.author] = None
-        await message.channel.send(f"Added {message.author.name}. Current list: {newline.join(i.name for i in names.keys())}")
+        await message.channel.send(f"Added {message.author.name}. \n Current list: \n {newline.join(i.name for i in names.keys())}")
 
     if message.content.startswith('$remove'):
         names.pop(message.author)
         await message.channel.send(f"Removed {message.author.name}. \n Current list: \n {newline.join(i.name for i in names.keys())}")
 
-client.run("")
+client.run("")  # token goes here
