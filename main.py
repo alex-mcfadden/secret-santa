@@ -22,4 +22,4 @@ async def on_message(message):
         names.pop(message.author)
         await message.channel.send(f"Removed {message.author.name}. \n Current list: \n {newline.join(i.name for i in names.keys())}")
 
-client.run("OTExNzIxMTEwMDIwNzEwNDYw.YZlgcw.hyAfdoQx5BfcXHyrTl8-KW9bm5o")
+client.run("")
