@@ -10,13 +10,21 @@ async def on_ready():
 
 names = {}
 
+
 @client.event
 async def on_message(message):
     if message.author == client.user:
         return
 
     if message.content.startswith('$add'):
-        names[message.author] = None
+        names[message.author] = {"address": None, "receiver": None}
+        channel = message.channel
+        await channel.send('Please enter an address to mail to')
+
+        def check(m):
+            return m.channel == channel
+        address = await client.wait_for('message', check=check, timeout=30.0)
+        names[message.author]['address'] = address.content
         await message.channel.send(f"Added {message.author.name}. \n Current list: \n {newline.join(i.name for i in names.keys())}")
 
     if message.content.startswith('$remove'):
@@ -33,23 +41,26 @@ async def on_message(message):
             return m.content == 'y' and m.channel == channel
         await client.wait_for('message', check=check, timeout=30.0)
         try:
-            shuffler(names)
-            await client.wait_for('message', check=check)
+            final_dict = shuffler(names)
+            for giver, receiver in final_dict.items():
+                receiver = receiver['receiver']
+                address = final_dict[receiver]["address"]
+                await giver.send(f"You are giving a gift to {receiver.name}. Their address is {address}")
         except:
             await message.channel.send("Not enough people to shuffle! (3 people needed)")
+
 
 def shuffler(names):
     if len(names) < 3:
         raise Exception("Not enough people")
-    givers = names.keys()
-    receivers = names.keys()
-    final_list = {}
+    givers = list(names.keys())
+    receivers = list(names.keys())
+    final_dict = {}
     while any(i == j for i, j in zip(givers, receivers)):
         random.shuffle(givers)
     for giver, receiver in zip(givers, receivers):
-        final_list[giver] = receiver
-    print(final_list)
-    for giver, receiver in names.items():
-        giver.send(f"Your santa is {receiver.name}")
+        final_dict[giver] = {"address": names[giver]['address'], "receiver": receiver}
+    return final_dict
+
 
 client.run("")  # token goes here
